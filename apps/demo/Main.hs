@@ -15,7 +15,7 @@ import Data.Function ((&))
 import Data.IORef
 import Graph (Graph, addEdge)
 import Graph qualified as G
-import Machines
+import Machines.Mealy
 import Data.Map (Map)
 import Data.Map.Strict qualified as Map
 --import Data.Maybe (fromMaybe)
@@ -31,19 +31,19 @@ import System.IO.Unsafe (unsafePerformIO)
 main :: IO ()
 main = do
   let testSelfLoopsRemoved =
-        let lhs = scanMealy 0 [Solved, Didn'tSolve] (graphToMealy simpleObserve extraSimpleTestGraph)
-            rhs = scanMealy 0 [Solved, Didn'tSolve] (graphToMealy simpleObserve (extraSimpleTestGraph & addEdge 0 0 4 Understood & addEdge 1 1 4 Didn'tUnderstand))
+        let lhs = scanMealyM 0 [Solved, Didn'tSolve] (graphToMealy simpleObserve extraSimpleTestGraph)
+            rhs = scanMealyM 0 [Solved, Didn'tSolve] (graphToMealy simpleObserve (extraSimpleTestGraph & addEdge 0 0 4 Understood & addEdge 1 1 4 Didn'tUnderstand))
         in assert (lhs == rhs) (pure ())
   testSelfLoopsRemoved
 
   Text.putStrLn "\nextraSimpleTestGraph:" >> p extraSimpleTestGraph
-  print $ scanMealy 0 [Solved, Didn'tSolve] $ graphToMealy simpleObserve extraSimpleTestGraph
+  print $ scanMealyM 0 [Solved, Didn'tSolve] $ graphToMealy simpleObserve extraSimpleTestGraph
 
   Text.putStrLn "\nsimpleTestGraph:" >> p simpleTestGraph
-  print $ scanMealy 0 [Didn'tSolve, Solved, Solved, Solved, Didn'tSolve] $ graphToMealy simpleObserve simpleTestGraph
+  print $ scanMealyM 0 [Didn'tSolve, Solved, Solved, Solved, Didn'tSolve] $ graphToMealy simpleObserve simpleTestGraph
 
   Text.putStrLn "\ndemoGraph:" >> p demoGraph
-  print $ scanMealy node0 demoInputs $ graphToMealy (flip observe) demoGraph
+  print $ scanMealyM node0 demoInputs $ graphToMealy (flip observe) demoGraph
 
 type ProblemId = Word
 type Weight = Word
